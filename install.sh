@@ -28,6 +28,19 @@ sed -i "s|rpc_servers =.*|rpc_servers = \"$(curl -s https://networks.testnet.nib
 sed -i "s|trust_height =.*|trust_height = \"$(curl -s https://networks.testnet.nibiru.fi/$NETWORK/trust_height)\"|g" "$config_file"
 sed -i "s|trust_hash =.*|trust_hash = \"$(curl -s https://networks.testnet.nibiru.fi/$NETWORK/trust_hash)\"|g" "$config_file"
 
+#set prunning
+sed -i \
+  -e 's|^pruning *=.*|pruning = "custom"|' \
+  -e 's|^pruning-keep-recent *=.*|pruning-keep-recent = "100"|' \
+  -e 's|^pruning-keep-every *=.*|pruning-keep-every = "0"|' \
+  -e 's|^pruning-interval *=.*|pruning-interval = "19"|' \
+  $HOME/.nibid/config/app.toml
+
+#download snapshot
+curl -L https://snapshots.kjnodes.com/nibiru/snapshot_latest.tar.lz4 | tar -Ilz4 -xf - -C $HOME/.nibid
+[[ -f $HOME/.nibid/data/upgrade-info.json ]] && cp $HOME/.nibid/data/upgrade-info.json $HOME/.nibid/cosmovisor/genesis/upgrade-info.json
+
+
 #create service
 sudo tee /etc/systemd/system/nibi.service > /dev/null << EOF
 [Unit]
