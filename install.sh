@@ -36,10 +36,8 @@ sed -i \
   -e 's|^pruning-interval *=.*|pruning-interval = "19"|' \
   $HOME/.nibid/config/app.toml
 
-#download snapshot
-curl -L https://snapshots.kjnodes.com/nibiru/snapshot_latest.tar.lz4 | tar -Ilz4 -xf - -C $HOME/.nibid
-[[ -f $HOME/.nibid/data/upgrade-info.json ]] && cp $HOME/.nibid/data/upgrade-info.json $HOME/.nibid/cosmovisor/genesis/upgrade-info.json
-
+#change ports
+sed -i.bak -e "s%:26658%:28658%; s%:26657%:28657%; s%:6060%:6260%; s%:26656%:28656%; s%:26660%:28660%" $HOME/.nibid/config/config.toml && sed -i.bak -e "s%:9090%:9290%; s%:9091%:9291%; s%:1317%:1517%; s%:8545%:8745%; s%:8546%:8746%; s%:6065%:6265%" $HOME/.nibid/config/app.toml && sed -i.bak -e "s%:26657%:28657%" $HOME/.nibid/config/client.toml 
 
 #create service
 sudo tee /etc/systemd/system/nibid.service > /dev/null << EOF
