@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ~/scripts/pryzm/config/env
+source ~/scripts/$NAME/config/env
 json=$(curl -s localhost:$PORT/status | jq .result.sync_info)
 
 pid=$(pgrep $BINARY)
