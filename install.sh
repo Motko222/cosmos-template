@@ -1,5 +1,18 @@
 #!/bin/bash
 
+if [ -f ~/scripts/nibiru/config/env ]
+ then
+   echo "Config file found."
+ else
+   read -p "Key name? " KEY
+   read -p "Moniker name? " MONIKER
+   echo "KEY="$KEY > ~/scripts/pryzm/config/env
+   echo "MONIKER="$MONIKER >> ~/scripts/pryzm/config/env
+   echo "Config file created."
+fi
+
+source ~/scripts/nibiru/config/env
+
 curl -s https://get.nibiru.fi/@v1.0.0! | bash
 nibid version
 nibid init $MONIKER --chain-id=nibiru-testnet-1 --home $HOME/.nibid
