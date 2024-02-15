@@ -42,9 +42,9 @@ curl -L https://snapshots.kjnodes.com/nibiru/snapshot_latest.tar.lz4 | tar -Ilz4
 
 
 #create service
-sudo tee /etc/systemd/system/nibi.service > /dev/null << EOF
+sudo tee /etc/systemd/system/nibid.service > /dev/null << EOF
 [Unit]
-Description=nibi node service
+Description=nibid node service
 After=network-online.target
 
 [Service]
@@ -53,8 +53,8 @@ ExecStart=/usr/local/bin/nibid start
 Restart=on-failure
 RestartSec=10
 LimitNOFILE=65535
-Environment="DAEMON_HOME=/root/.nibi"
-Environment="DAEMON_NAME=nibi"
+Environment="DAEMON_HOME=/root/.nibid"
+Environment="DAEMON_NAME=nibid"
 Environment="UNSAFE_SKIP_BACKUP=true"
 Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
 
@@ -63,6 +63,6 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable nibi.service
+sudo systemctl enable nibid.service
 
 echo "Installation done, service is not started. Please run it with start.sh."
