@@ -1,4 +1,4 @@
 #!/bin/bash
 
-sudo systemctl restart nibi.service
-sudo journalctl -u nibi.service -f --no-hostname -o cat
+sudo systemctl restart $BINARY.service
+sudo journalctl -u $BINARY.service -f --no-hostname -o cat
