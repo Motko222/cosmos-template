@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ~/scripts/$NAME/config/env
+source ~/scripts/nibiru/config/env
 json=$(curl -s localhost:$PORT/status | jq .result.sync_info)
 
 pid=$(pgrep $BINARY)
