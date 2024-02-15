@@ -1,3 +1,3 @@
 #!/bin/bash
-
-sudo systemctl stop nibi.service
+source ~/scripts/nibiru/config/env
+sudo systemctl stop $BINARY.service
