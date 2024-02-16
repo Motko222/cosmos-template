@@ -7,7 +7,7 @@ if [ -f ~/scripts/$FOLDER/config/env ]
    echo "Config file found."
  else
    read -p "Key name? "     KEY;       echo "KEY="$KEY            > ~/scripts/$FOLDER/config/env
-   read -p "Moniker name? " MONIKER;   echo "MONIKER="$MONIKER   >> ~/scripts/$FOLDER/config/env
+   read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER   >> ~/scripts/$FOLDER/config/env
    read -p "Binary? "       BINARY;    echo "BINARY="$BINARY     >> ~/scripts/$FOLDER/config/env
    read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK   >> ~/scripts/$FOLDER/config/env
    read -p "Password? "     PWD;       echo "PWD="$PWD           >> ~/scripts/$FOLDER/config/env
