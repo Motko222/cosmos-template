@@ -12,7 +12,7 @@ if [ -f ~/scripts/$FOLDER/config/env ]
    read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK   >> ~/scripts/$FOLDER/config/env
    read -p "Password? "     PWD;       echo "PWD="$PWD           >> ~/scripts/$FOLDER/config/env
    read -p "Port set? "     PORT;      echo "PORT="$PORT         >> ~/scripts/$FOLDER/config/env
-   read -p "URL? "          URL;       echo "URL="$URL           >> ~/scripts/$FOLDER/config/env
+   read -p "Seed server? "  SEED;      echo "SEED="$SEED         >> ~/scripts/$FOLDER/config/env
    read -p "Min gas? "      GAS;       echo "GAS="$GAS           >> ~/scripts/$FOLDER/config/env
    echo "Config file created."
 fi
@@ -24,13 +24,13 @@ source ~/scripts/$FOLDER/config/env
 $BINARY version
 
 $BINARY init $MONIKER --chain-id=$NETWORK --home $HOME/.$BINARY
-$BINARY keys add $KEY
+echo $PWD $PWD | $BINARY keys add $KEY
 
 # genesis
-curl -s $URL/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
+curl -s $SEED/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
 
 #seeds
-sed -i 's|seeds =.*|seeds = "'$(curl -s $URL/$NETWORK/seeds)'"|g' $HOME/.$BINARY/config/config.toml
+sed -i 's|seeds =.*|seeds = "'$(curl -s $SEED/$NETWORK/seeds)'"|g' $HOME/.$BINARY/config/config.toml
 
 #min gas
 sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "$GAS"/g' $HOME/.$BINARY/config/app.toml
@@ -45,7 +45,10 @@ sed -i \
 
 #change ports
 case $PORT in
- 2) sed -i.bak -e "s%:26658%:28658%; s%:26657%:28657%; s%:6060%:6260%; s%:26656%:28656%; s%:26660%:28660%" $HOME/.$BINARY/config/config.tomlsed -i.bak -e "s%:9090%:9290%; s%:9091%:9291%; s%:1317%:1517%; s%:8545%:8745%; s%:8546%:8746%; s%:6065%:6265%" $HOME/.$BINARY/config/app.toml && sed -i.bak -e "s%:26657%:28657%" $HOME/.$BINARY/config/client.toml 
+ 0|"") #default
+ 2) sed -i.bak -e "s%:26658%:28658%; s%:26657%:28657%; s%:6060%:6260%; s%:26656%:28656%; s%:26660%:28660%" $HOME/.$BINARY/config/config.toml
+    sed -i.bak -e "s%:9090%:9290%; s%:9091%:9291%; s%:1317%:1517%; s%:8545%:8745%; s%:8546%:8746%; s%:6065%:6265%" $HOME/.$BINARY/config/app.toml
+    sed -i.bak -e "s%:26657%:28657%" $HOME/.$BINARY/config/client.toml 
 esac
 
 #create service
