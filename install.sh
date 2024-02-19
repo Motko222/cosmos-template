@@ -6,14 +6,15 @@ if [ -f ~/scripts/$FOLDER/config/env ]
  then
    echo "Config file found."
  else
-   read -p "Key name? "     KEY;       echo "KEY="$KEY            > ~/scripts/$FOLDER/config/env
-   read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER   >> ~/scripts/$FOLDER/config/env
-   read -p "Binary? "       BINARY;    echo "BINARY="$BINARY     >> ~/scripts/$FOLDER/config/env
-   read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK   >> ~/scripts/$FOLDER/config/env
-   read -p "Password? "     PWD;       echo "PWD="$PWD           >> ~/scripts/$FOLDER/config/env
-   read -p "Port set? "     PORT;      echo "PORT="$PORT         >> ~/scripts/$FOLDER/config/env
-   read -p "Seed server? "  SEED;      echo "SEED="$SEED         >> ~/scripts/$FOLDER/config/env
-   read -p "Min gas? "      GAS;       echo "GAS="$GAS           >> ~/scripts/$FOLDER/config/env
+   read -p "Key name? "     KEY;       echo "KEY="$KEY               > ~/scripts/$FOLDER/config/env
+   read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER      >> ~/scripts/$FOLDER/config/env
+   read -p "Binary? "       BINARY;    echo "BINARY="$BINARY        >> ~/scripts/$FOLDER/config/env
+   read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK      >> ~/scripts/$FOLDER/config/env
+   read -p "Password? "     PWD;       echo "PWD="$PWD              >> ~/scripts/$FOLDER/config/env
+   read -p "Port set? "     PORT_SET;  echo "PORT_SET="$PORT_SET    >> ~/scripts/$FOLDER/config/env
+   read -p "Seed server? "  SEED;      echo "SEED="$SEED            >> ~/scripts/$FOLDER/config/env
+   read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> ~/scripts/$FOLDER/config/env
+   read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> ~/scripts/$FOLDER/config/env
    echo "Config file created."
 fi
 
@@ -33,7 +34,7 @@ curl -s $SEED/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
 sed -i 's|seeds =.*|seeds = "'$(curl -s $SEED/$NETWORK/seeds)'"|g' $HOME/.$BINARY/config/config.toml
 
 #min gas
-sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "$GAS"/g' $HOME/.$BINARY/config/app.toml
+sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "$GAS_PRICE"/g' $HOME/.$BINARY/config/app.toml
 
 #prunning
 sed -i \
