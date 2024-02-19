@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ~/scripts/nibiru/config/env
+FOLDER=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
+source ~/scripts/$FOLDER/config/env
+
 json=$(curl -s localhost:$PORT/status | jq .result.sync_info)
 
 pid=$(pgrep $BINARY)
@@ -35,7 +37,7 @@ fi
 
 if $jailed
  then
-  status="warning"
+  status="error"
   note="jailed"
 fi 
 
@@ -52,8 +54,6 @@ echo "note='$note'"
 echo "network='$network'"
 echo "type="$type
 echo "folder1=$foldersize1"
-#echo "folder2=$foldersize2"
-#echo "log=$logsize" 
 echo "id=$MONIKER" 
 echo "key=$KEY"
 echo "wallet=$wallet"
