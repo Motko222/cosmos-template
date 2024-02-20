@@ -11,10 +11,10 @@ if [ -f ~/scripts/$FOLDER/config/env ]
    read -p "Binary? "       BINARY;    echo "BINARY="$BINARY        >> ~/scripts/$FOLDER/config/env
    read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK      >> ~/scripts/$FOLDER/config/env
    read -p "Password? "     PWD;       echo "PWD="$PWD              >> ~/scripts/$FOLDER/config/env
-   read -p "Port set? "     PORT_SET;  echo "PORT_SET="$PORT_SET    >> ~/scripts/$FOLDER/config/env
-   read -p "Seed server? "  SEED;      echo "SEED="$SEED            >> ~/scripts/$FOLDER/config/env
    read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> ~/scripts/$FOLDER/config/env
    read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> ~/scripts/$FOLDER/config/env
+   read -p "Port set? "     port_set;  
+   read -p "Seed server? "  seed;      
    echo "Config file created."
 fi
 
@@ -28,10 +28,10 @@ $BINARY init $MONIKER --chain-id=$NETWORK --home $HOME/.$BINARY
 echo $PWD $PWD | $BINARY keys add $KEY
 
 # genesis
-curl -s $SEED/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
+curl -s $seed/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
 
 #seeds
-sed -i 's|seeds =.*|seeds = "'$(curl -s $SEED/$NETWORK/seeds)'"|g' $HOME/.$BINARY/config/config.toml
+sed -i 's|seeds =.*|seeds = "'$(curl -s $seed/$NETWORK/seeds)'"|g' $HOME/.$BINARY/config/config.toml
 
 #min gas
 sed -i 's/minimum-gas-prices =.*/minimum-gas-prices = "$GAS_PRICE"/g' $HOME/.$BINARY/config/app.toml
@@ -45,7 +45,7 @@ sed -i \
   $HOME/.$BINARY/config/app.toml
 
 #change ports
-case $PORT_SET in
+case $port_set in
  1) sed -i.bak -e "s%:26658%:27658%; s%:26657%:27657%; s%:6060%:6160%; s%:26656%:27656%; s%:26660%:27660%" $HOME/.$BINARY/config/config.toml 
     sed -i.bak -e "s%:9090%:9190%; s%:9091%:9191%; s%:1317%:1417%; s%:8545%:8645%; s%:8546%:8646%; s%:6065%:6165%" $HOME/.$BINARY/config/app.toml 
     sed -i.bak -e "s%:26657%:27657%" $HOME/.$BINARY/config/client.toml 
