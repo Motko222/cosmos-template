@@ -13,6 +13,7 @@ if [ -f ~/scripts/$FOLDER/config/env ]
    read -p "Password? "     PWD;       echo "PWD="$PWD              >> ~/scripts/$FOLDER/config/env
    read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> ~/scripts/$FOLDER/config/env
    read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> ~/scripts/$FOLDER/config/env
+   read -p "Denom? "        DENOM;     echo "DENOM="$DENOM          >> ~/scripts/$FOLDER/config/env
    read -p "Port set? "     port_set;  
    read -p "Seed server? "  seed;      
    echo "Config file created."
