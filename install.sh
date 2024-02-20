@@ -4,7 +4,7 @@ FOLDER=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{prin
 
 if [ -f ~/scripts/$FOLDER/config/env ]
  then
-   echo "Config file found."
+   echo "Config file found."  
  else
    read -p "Key name? "     KEY;       echo "KEY="$KEY               > ~/scripts/$FOLDER/config/env
    read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER      >> ~/scripts/$FOLDER/config/env
@@ -13,9 +13,7 @@ if [ -f ~/scripts/$FOLDER/config/env ]
    read -p "Password? "     PWD;       echo "PWD="$PWD              >> ~/scripts/$FOLDER/config/env
    read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> ~/scripts/$FOLDER/config/env
    read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> ~/scripts/$FOLDER/config/env
-   read -p "Denom? "        DENOM;     echo "DENOM="$DENOM          >> ~/scripts/$FOLDER/config/env
-   read -p "Port set? "     port_set;  
-   read -p "Seed server? "  seed;      
+   read -p "Denom? "        DENOM;     echo "DENOM="$DENOM          >> ~/scripts/$FOLDER/config/env   
    echo "Config file created."
 fi
 
@@ -25,10 +23,12 @@ source ~/scripts/$FOLDER/config/env
 #put instalation script here
 $BINARY version
 
+#init node and wallet
 $BINARY init $MONIKER --chain-id=$NETWORK --home $HOME/.$BINARY
-echo $PWD $PWD | $BINARY keys add $KEY
+{ echo $PWD; sleep 1; echo $PWD } | $BINARY keys add $KEY
 
 # genesis
+read -p "Server to fetch genesis and seeds from? "  seed; 
 curl -s $seed/$NETWORK/genesis > $HOME/.$BINARY/config/genesis.json
 
 #seeds
@@ -46,6 +46,7 @@ sed -i \
   $HOME/.$BINARY/config/app.toml
 
 #change ports
+read -p "Port set? " port_set;  
 case $port_set in
  1) sed -i.bak -e "s%:26658%:27658%; s%:26657%:27657%; s%:6060%:6160%; s%:26656%:27656%; s%:26660%:27660%" $HOME/.$BINARY/config/config.toml 
     sed -i.bak -e "s%:9090%:9190%; s%:9091%:9191%; s%:1317%:1417%; s%:8545%:8645%; s%:8546%:8646%; s%:6065%:6165%" $HOME/.$BINARY/config/app.toml 
