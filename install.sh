@@ -1,23 +1,24 @@
 #!/bin/bash
 
-FOLDER=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
+folder=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
+config=~/scripts/$folder/cfg
 
-if [ -f ~/scripts/$FOLDER/config/env ]
+if [ -f $config ]
  then
    echo "Config file found."  
  else
-   read -p "Key name? "     KEY;       echo "KEY="$KEY               > ~/scripts/$FOLDER/config/env
-   read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER      >> ~/scripts/$FOLDER/config/env
-   read -p "Binary? "       BINARY;    echo "BINARY="$BINARY        >> ~/scripts/$FOLDER/config/env
-   read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK      >> ~/scripts/$FOLDER/config/env
-   read -p "Password? "     PWD;       echo "PWD="$PWD              >> ~/scripts/$FOLDER/config/env
-   read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> ~/scripts/$FOLDER/config/env
-   read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> ~/scripts/$FOLDER/config/env
-   read -p "Denom? "        DENOM;     echo "DENOM="$DENOM          >> ~/scripts/$FOLDER/config/env   
+   read -p "Key name? "     KEY;       echo "KEY="$KEY               > $config
+   read -p "Moniker? "      MONIKER;   echo "MONIKER="$MONIKER      >> $config
+   read -p "Binary? "       BINARY;    echo "BINARY="$BINARY        >> $config
+   read -p "Network? "      NETWORK;   echo "NETWORK="$NETWORK      >> $config
+   read -p "Password? "     PWD;       echo "PWD="$PWD              >> $config
+   read -p "Min gas price?" GAS_PRICE; echo "GAS_PRICE="$GAS_PRICE  >> $config
+   read -p "Min gas adj? "  GAS_ADJ;   echo "GAS_ADJ="$GAS_ADJ      >> $config
+   read -p "Denom? "        DENOM;     echo "DENOM="$DENOM          >> $config   
    echo "Config file created."
 fi
 
-source ~/scripts/$FOLDER/config/env
+source $config
 
 #install binary
 #put instalation script here
