@@ -1,7 +1,9 @@
 #!/bin/bash
 
-FOLDER=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
-source ~/scripts/$FOLDER/config/env
+#usage: bash delegate.sh <key> <valoper> <amount>
+
+folder=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
+source ~/scripts/$folder/cfg
 
 if [ -z $1 ]
 then
@@ -33,4 +35,4 @@ else
 fi
 
 echo $PWD | $BINARY tx staking delegate $valoper $amount --from $key \
- --chain-id $NETWORK --gas-prices $GAS_PRICE --gas-adjustment $GAS_ADJ --gas auto -y
+ --chain-id $CHAIN --gas-prices $GAS_PRICE --gas-adjustment $GAS_ADJ --gas auto -y
