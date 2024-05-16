@@ -5,34 +5,18 @@
 folder=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
 source ~/scripts/$folder/cfg
 
-if [ -z $1 ]
-then
- read -p "From key (default $KEY) ? " key
- if [ -z $key ]; then key=$KEY; fi
-else
- key=$1
-fi
+[ -z $1 ] && read -p "From ($KEY) ? " key || key=$1
+[ -z $key ] && key=$KEY
 
-wallet=$(echo $PWD | $BINARY keys show $key -a)
-balance=$($BINARY query bank balances $wallet -o json 2>/dev/null \
-      | jq -r '.balances[] | select(.denom=="'$DENOM'")' | jq -r .amount)
+wallet=$(echo $PASS | $BINARY keys show $key -a)
+balance=$($BINARY query bank balances $wallet -o json 2>/dev/null | jq -r '.balances[] | select(.denom=="'$DENOM'")' | jq -r .amount)
 echo "Balance: $balance $DENOM"
 
-if [ -z $2 ]
-then
- def_valoper=$(echo $PWD | $BINARY keys show $key -a --bech val)
- read -p "To valoper (default $def_valoper) ? " valoper
- if [ -z $valoper ]; then valoper=$def_valoper; fi
-else
- valoper=$2
-fi
+def_valoper=$(echo $PASS | $BINARY keys show $KEY -a --bech val)
+[ -z $2 ] && read -p "To valoper (default $def_valoper) ? " valoper || valoper=$2
+[ -z $valoper ] && valoper=$def_valoper
 
-if [ -z $3 ]
-then
- read -p "Amount incl. denom  ? " amount
-else
- amount=$3
-fi
+[ -z $3 ] && read -p "Amount ? " amount || amount=$3
 
-echo $PWD | $BINARY tx staking delegate $valoper $amount --from $key \
- --chain-id $CHAIN --gas-prices $GAS_PRICE --gas-adjustment $GAS_ADJ --gas auto -y
+echo $PASS | $BINARY tx staking delegate $valoper $amount$DENOM --from $key \
+ --gas-prices $GAS_PRICE --gas-adjustment $GAS_ADJ --gas auto -y | tail -1
