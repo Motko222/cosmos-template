@@ -3,12 +3,12 @@
 folder=$(echo $(cd -- $(dirname -- "${BASH_SOURCE[0]}") && pwd) | awk -F/ '{print $NF}')
 source ~/scripts/$folder/cfg
 source ~/.bash_profile
+
 bucket=validator
-
-json=$(curl -s localhost:$PORT/status | jq .result.sync_info)
-
+rpc_port=$(mantrachaind config | jq -r .node | cut -d : -f 3)
+json=$(curl -s localhost:$rpc_port/status | jq .result.sync_info)
 pid=$(pgrep $BINARY)
-ver=$($BINARY version)
+version=$($BINARY version)
 network=$($BINARY status | jq -r .NodeInfo.network)
 type="validator"
 foldersize1=$(du -hs ~/.pryzm | awk '{print $1}')
@@ -16,60 +16,67 @@ foldersize1=$(du -hs ~/.pryzm | awk '{print $1}')
 latestBlock=$(echo $json | jq -r .latest_block_height)
 catchingUp=$(echo $json | jq -r .catching_up)
 votingPower=$($BINARY status 2>&1 | jq -r .ValidatorInfo.VotingPower)
-wallet=$(echo $PWD | $BINARY keys show $KEY -a)
-valoper=$(echo $PWD | $BINARY keys show $KEY -a --bech val)
+chain=$(echo $json | jq -r '."chain-id"')
+wallet=$(echo $PASS | $BINARY keys show $KEY -a)
+valoper=$(echo $PASS | $BINARY keys show $KEY -a --bech val)
+moniker=$($BINARY query staking validator $valoper -o json | jq -r .description.moniker)
 pubkey=$($BINARY tendermint show-validator --log_format json | jq -r .key)
 delegators=$($BINARY query staking delegations-to $valoper -o json | jq '.delegation_responses | length')
 jailed=$($BINARY query staking validator $valoper -o json | jq -r .jailed)
 if [ -z $jailed ]; then jailed=false; fi
 tokens=$($BINARY query staking validator $valoper -o json | jq -r .tokens | awk '{print $1/1000000}')
 balance=$($BINARY query bank balances $wallet -o json 2>/dev/null \
-      | jq -r '.balances[] | select(.denom=="upryzm")' | jq -r .amount | awk '{print $1/1000000}')
+      | jq -r '.balances[] | select(.denom=="'$DENOM'")' | jq -r .amount)
 active=$($BINARY query tendermint-validator-set | grep -c $pubkey)
 threshold=$($BINARY query tendermint-validator-set -o json | jq -r .validators[].voting_power | tail -1)
 
 if $catchingUp
  then 
-  status="warning"
-  note="height=$latestBlock"
+  status="syncing"
+  message="height=$latestBlock"
  else 
-  status="ok"
-  note="act $active | del $delegators | vp $tokens | thr $threshold | bal $balance"
+  if [ $active -eq 1 ]; then status=active; else status=inactive; fi
 fi
 
 if $jailed
  then
   status="error"
-  note="jailed"
+  message="jailed"
 fi 
 
 if [ -z $pid ];
 then status="error";
- note="not running";
+ message="process not running";
 fi
 
-echo "updated='$(date +'%y-%m-%d %H:%M')'"
-echo "version='$ver'"
-echo "process='$pid'"
-echo "status="$status
-echo "note='$note'"
-echo "network='$network'"
-echo "type="$type
-echo "folder1=$foldersize1"
-echo "id=$MONIKER" 
-echo "key=$KEY"
-echo "wallet=$wallet"
-echo "valoper=$valoper"
-echo "pubkey=$pubkey"
-echo "catchingUp=$catchingUp"
-echo "jailed=$jailed"
-echo "active=$active"
-echo "height=$latestBlock"
-echo "votingPower=$votingPower"
-echo "tokens=$tokens"
-echo "threshold=$threshold"
-echo "delegators=$delegators"
-echo "balance=$balance"
+#json output
+cat << EOF
+{
+  "updated":"$(date --utc +%FT%TZ)",
+  "id":"$ID",
+  "machine":"$MACHINE",
+  "version":"$version",
+  "chain":"$chain",
+  "status":"$status",
+  "message":"$message",
+  "rpcport":"$rpc_port",
+  "folder1":"$foldersize1",
+  "moniker":"$moniker",
+  "key":"$KEY",
+  "wallet":"$wallet",
+  "valoper":"$valoper",
+  "pubkey":"$pubkey",
+  "catchingUp":"$catchingUp",
+  "jailed":"$jailed",
+  "active":$active,
+  "height":$latestBlock,
+  "votingPower":$votingPower,
+  "tokens":$tokens,
+  "threshold":$threshold,
+  "delegators":$delegators,
+  "balance":$balance
+}
+EOF
 
 # send data to influxdb
 if [ ! -z $INFLUX_HOST ]
@@ -80,6 +87,6 @@ then
   --header "Content-Type: text/plain; charset=utf-8" \
   --header "Accept: application/json" \
   --data-binary "
-    status,machine=$MACHINE,id=$id,moniker=$moniker status=\"$status\",message=\"$message\",version=\"$version\",url=\"$url\",chain=\"$chain\",tokens=\"$tokens\",threshold=\"$threshold\",active=\"$active\",jailed=\"$jailed\" $(date +%s%N) 
+    status,machine=$MACHINE,id=$ID,moniker=$moniker status=\"$status\",message=\"$message\",version=\"$version\",url=\"$url\",chain=\"$chain\",tokens=\"$tokens\",threshold=\"$threshold\",active=\"$active\",jailed=\"$jailed\" $(date +%s%N) 
     "
 fi
